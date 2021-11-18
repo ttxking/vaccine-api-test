@@ -1,5 +1,14 @@
 # API-Testing
-Test API of WCG group using registration endpoint
+Test API of WCG group using registration endpoint based on this [API format](https://wcg-apis.herokuapp.com/document/registration)
+
+Test date: 18/11/2021
+
+Defect found:
+
+1. Name can be integer value  like 123
+2. Surname can be integer value  like 123
+3. Phone number can be a string value like "abcdefghij"
+4. Phone number can be any digits like 081
 
 | Test case                                          | Expected Result                                                                           | Status |
 |----------------------------------------------------|-------------------------------------------------------------------------------------------|--------|
@@ -17,3 +26,4 @@ Test API of WCG group using registration endpoint
 | test_post_registration_missing_occupation          | return 400 Bad Request                                                                    |    P   |
 | test_post_registration_missing_address             | return 400 Bad Request                                                                    |    P   |
 | test_post_registration_string_phone_number         | should not return feedback responses registration success                                 |    F   |
+| test_post_registration_non_10_digit_phone_number   | should not return feedback responses registration success                                 |    F   |

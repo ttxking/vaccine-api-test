@@ -16,7 +16,6 @@ def create_user(citizen_id, name, surname, birth_date, occupation, phone_number,
     }
 
 
-
 class RegistrationAPITest(unittest.TestCase):
 
     def setUp(self):
@@ -121,7 +120,11 @@ class RegistrationAPITest(unittest.TestCase):
         self.response = requests.post(self.base_url, params=self.citizen_1)
         self.assertNotEqual(self.response.json()['feedback'], "registration success!")
 
-    
+    def test_post_registration_non_10_digit_phone_number(self):
+        """Test registered with phone number not 10 digits."""
+        self.citizen_1['phone_number'] = "081"
+        self.response = requests.post(self.base_url, params=self.citizen_1)
+        self.assertNotEqual(self.response.json()['feedback'], "registration success!")
 
 
 if __name__ == "__main__":
