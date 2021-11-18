@@ -1,6 +1,7 @@
 """"Unit tests for Registration API"""
 import unittest
 import requests
+from decouple import config
 
 def create_user(citizen_id, name, surname, birth_date, occupation, phone_number, is_risk, address):
     """Create new user for registration."""
@@ -19,7 +20,7 @@ def create_user(citizen_id, name, surname, birth_date, occupation, phone_number,
 class RegistrationAPITest(unittest.TestCase):
 
     def setUp(self):
-        self.base_url = 'https://wcg-apis.herokuapp.com/registration'
+        self.base_url = config('SITE_URL')
         self.citizen_1 = create_user('1116789838901', 'Benjamin', 'Lee', '1999-05-17', 'bartender', '0817741235', 'False', 'Bangkok')
         requests.delete(f'{self.base_url}/1116789838901')
 
