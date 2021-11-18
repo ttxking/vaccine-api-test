@@ -115,12 +115,13 @@ class RegistrationAPITest(unittest.TestCase):
         self.response = requests.post(self.base_url, params=self.citizen_1)
         self.assertEqual(self.response.status_code, 400)
     
-    # this may fail if they dont handle the phone number string
     def test_post_registration_string_phone_number(self):
         """Test registered with string phone number as param."""
         self.citizen_1['phone_number'] = 'abcdefghij'
         self.response = requests.post(self.base_url, params=self.citizen_1)
         self.assertNotEqual(self.response.json()['feedback'], "registration success!")
+
+    
 
 
 if __name__ == "__main__":
