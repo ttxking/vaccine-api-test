@@ -1,6 +1,7 @@
 """"Unit tests for Registration API"""
 import unittest
 import requests
+from requests.models import HTTPError
 from decouple import config
 
 def create_user(citizen_id, name, surname, birth_date, occupation, phone_number, is_risk, address):
@@ -24,6 +25,20 @@ class RegistrationAPITest(unittest.TestCase):
         self.citizen_1 = create_user('1116789838901', 'Benjamin', 'Lee', '1999-05-17', 'bartender', '0817741235', 'False', 'Bangkok')
         requests.delete(f'{self.base_url}/1116789838901')
 
+    def test_get_valid_registration(self):
+        """Test get valid registration from the site."""
+        requests.post(self.base_url, params=self.citizen_1)
+        self.response = requests.get(f'{self.base_url}/1116789838901')
+        self.assertEqual(self.response.status_code, 200)
+        self.citizen_1['vaccine_taken'] = '[]'
+        self.assertEqual(self.response.json(), self.citizen_1)
+
+    def test_get_invalid_registration(self):
+        """Test get invalid registration from the site."""
+        requests.post(self.base_url, params=self.citizen_1)
+        self.response = requests.get(f'{self.base_url}/1116789838902')
+        self.assertEqual(self.response.status_code, 404)
+
     def test_post_registration_with_correct_format(self):
         """Test registered with corrected format."""
         self.response = requests.post(self.base_url, params=self.citizen_1)
@@ -42,6 +57,7 @@ class RegistrationAPITest(unittest.TestCase):
         missing_id = self.citizen_1.pop('citizen_id', None)
         self.response = requests.post(self.base_url, params=missing_id)
         self.assertEqual(self.response.status_code, 400)
+        self.assertIn("Bad Request", self.response.text)
 
     def test_post_registration_non_13_digit_citizen_id(self):
         """Test registered with citizen_id that isn't 13 digits."""
@@ -55,6 +71,7 @@ class RegistrationAPITest(unittest.TestCase):
         self.citizen_1.pop('name', None)
         self.response = requests.post(self.base_url, params=self.citizen_1)
         self.assertEqual(self.response.status_code, 400)
+        self.assertIn("Bad Request", self.response.text)
         
 
     def test_post_registration_using_integer_name(self):
@@ -68,6 +85,7 @@ class RegistrationAPITest(unittest.TestCase):
         self.citizen_1.pop('surname', None)
         self.response = requests.post(self.base_url, params=self.citizen_1)
         self.assertEqual(self.response.status_code, 400)
+        self.assertIn("Bad Request", self.response.text)
 
     def test_post_registration_using_integer_surname(self):
         """Test registered using surname that is integer."""
@@ -81,6 +99,7 @@ class RegistrationAPITest(unittest.TestCase):
         self.citizen_1.pop('birth_date', None)
         self.response = requests.post(self.base_url, params=self.citizen_1)
         self.assertEqual(self.response.status_code, 400)
+        self.assertIn("Bad Request", self.response.text)
 
     def test_post_registration_incorrect_birth_date_format(self):
         """Test registered using %Y-%d-% format for birth_date."""
@@ -101,19 +120,21 @@ class RegistrationAPITest(unittest.TestCase):
         self.citizen_1.pop('occupation', None)
         self.response = requests.post(self.base_url, params=self.citizen_1)
         self.assertEqual(self.response.status_code, 400)
-
+        self.assertIn("Bad Request", self.response.text)
 
     def test_post_registration_missing_address(self):
         """Test registered with missing address as param."""
         self.citizen_1.pop('address', None)
         self.response = requests.post(self.base_url, params=self.citizen_1)
         self.assertEqual(self.response.status_code, 400)
+        self.assertIn("Bad Request", self.response.text)
 
     def test_post_registration_missing_phone_number(self):
         """Test registered with missing phone number as param."""
         self.citizen_1.pop('phone_number', None)
         self.response = requests.post(self.base_url, params=self.citizen_1)
         self.assertEqual(self.response.status_code, 400)
+        self.assertIn("Bad Request", self.response.text)
     
     def test_post_registration_string_phone_number(self):
         """Test registered with string phone number as param."""
@@ -127,6 +148,21 @@ class RegistrationAPITest(unittest.TestCase):
         self.response = requests.post(self.base_url, params=self.citizen_1)
         self.assertNotEqual(self.response.json()['feedback'], "registration success!")
 
+    def test_delete_valid_registration(self):
+        """Test delete valid registration from the site."""
+        requests.post(self.base_url, params=self.citizen_1)
+        self.response = requests.delete(f'{self.base_url}/1116789838901')
+        self.assertEqual(self.response.status_code, 200)
+        # if we get again it should not be found
+        self.response = requests.get(f'{self.base_url}/1116789838901')
+        self.assertNotIn(self.response, self.citizen_1)
+        self.assertEqual(self.response.status_code, 404)
+
+    def test_delete_invalid_registration(self): 
+        """Test delete invalid registration from the site."""
+        self.response = requests.delete(f'{self.base_url}/1116789838902')
+        self.assertEqual(self.response.status_code, 404)
+        
 
 if __name__ == "__main__":
     unittest.main()

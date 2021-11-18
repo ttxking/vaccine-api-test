@@ -1,4 +1,5 @@
 # API-Testing
+
 Test API of WCG group using registration endpoint based on this [API format](https://wcg-apis.herokuapp.com/document/registration)
 
 Test date: 18/11/2021
@@ -10,8 +11,11 @@ Defect found:
 3. Phone number can be a string value like "abcdefghij"
 4. Phone number can be any digits like 081
 
+Test cases list:
 | Test case                                          | Expected Result                                                                           | Status |
 |----------------------------------------------------|-------------------------------------------------------------------------------------------|--------|
+| test_get_valid_registration                        | return 200 OK and JSON of citizen object with vaccine_taken added                         |    P   |
+| test_get_invalid_registration                      | return 404 Not Found                                                                      |    P   |
 | test_post_registration_with_correct_format         | return 201 Created and feedback responses registration success                            |    P   |
 | test_post_already_register_person                  | return 200 OK with feedback responses registration failed: this person already registered |    P   |
 | test_post_registration_missing_citizen_id          | return 400 Bad Request                                                                    |    P   |
@@ -27,3 +31,5 @@ Defect found:
 | test_post_registration_missing_address             | return 400 Bad Request                                                                    |    P   |
 | test_post_registration_string_phone_number         | should not return feedback responses registration success                                 |    F   |
 | test_post_registration_non_10_digit_phone_number   | should not return feedback responses registration success                                 |    F   |
+| test_delete_valid_registration                     | return 200 OK and should that citizen should not be in the reservation                    |    P   |
+| test_delete_invalid_registration                   | return 404 Not Found                                                                      |    P   |
